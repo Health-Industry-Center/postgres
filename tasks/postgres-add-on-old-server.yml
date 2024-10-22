@@ -1,0 +1,12 @@
+---
+- name: add new line in pg_hba.conf
+  lineinfile:
+    dest: "{{ postgresql_dir }}/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: '0640'
+    state: present
+    insertafter: EOF
+    line: "{{ item.type }} {{ item.database }} {{ item.user }} {{ item.address|default('') }} {{ item.ip_address|default('') }} {{ item.ip_mask|default('') }} {{ item.auth_method }} {{ item.auth_options|default('') }}"
+  with_items: "{{ postgresql_hba_entries }}"
+  notify: restart postgresql

@@ -1,0 +1,50 @@
+---
+- name: Install postgresql Debian
+  apt:
+    name: "{{ item }}"
+    state: present 
+    update_cache: yes 
+    install_recommends: yes
+  environment:
+    - NEEDRESTART_MODE: automatically
+  with_items:
+  - postgresql
+  - postgresql-contrib
+  when: ansible_os_family == 'Debian'
+
+- name: disable default postgresql RedHat
+  command: dnf -qy module disable postgresql
+  when: ansible_os_family == 'RedHat'
+
+- name: Install postgresql RedHat
+  dnf:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+  - postgresql14-server
+  - postgresql14-contrib
+  when: ansible_os_family == 'RedHat'
+
+- name: Check if PostgreSQL database is initialized.
+  find:
+    path: "{{ postgresql_dir }}"
+  register: pgdata_dir_version
+
+- name: Ensure PostgreSQL database is initialized.
+  command: "/usr/pgsql-14/bin/postgresql-14-setup initdb"
+  when: not pgdata_dir_version.matched and ansible_os_family == 'RedHat'
+
+- name: Ensure PostgreSQL unix socket dirs exist.
+  file:
+    path: /var/run/postgresql
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: 0775
+
+- name: started and enabled PostgreSQL
+  service:
+    name: "{{ postgresql_service }}"
+    state: started
+    enabled: true

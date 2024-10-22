@@ -1,0 +1,41 @@
+---
+- name: Ensure all configured locales are present.
+  locale_gen: 
+    name: "{{ item }}" 
+    state: present
+  with_items: "{{ postgresql_locales }}"
+  register: locale_gen_result
+  notify: restart postgresql
+  when: ansible_os_family == 'Debian'
+
+- name: Check existing locales
+  shell: "locale -a | grep -i {{ item | regex_replace('-', '') | quote }}"
+  register: found_locales
+  changed_when: false
+  failed_when: false
+  loop: "{{ postgresql_locales }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Create missing locales
+  command: "localedef -i {{ item.item | regex_replace('(.*)\\..*', '\\1') | quote }} -f {{ item.item | regex_replace('.*\\.(.*)', '\\1') | quote }} {{ item.item | quote }}"
+  when: ansible_os_family == 'RedHat' and item.rc != 0
+  loop: "{{ found_locales.results }}"
+  notify: restart postgresql
+
+- name: Template postgresql.conf
+  template: 
+    src: "{{ ansible_distribution }}-{{ ansible_distribution_version.split('.')[0] }}-postgresql.conf.j2"
+    dest: "{{ postgresql_dir }}/postgresql.conf"
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  notify: restart postgresql
+
+- name: Template pg_hba.conf
+  template: 
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_dir }}/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: '0640'
+  notify: restart postgresql

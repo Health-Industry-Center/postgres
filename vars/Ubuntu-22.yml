@@ -1,0 +1,3 @@
+---
+postgresql_dir: "/etc/postgresql/14/main"
+postgresql_service: "postgresql"

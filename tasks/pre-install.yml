@@ -1,0 +1,51 @@
+---
+- name: change user shell to bash
+  user:
+    name: "{{ deploy_user }}"
+    shell: /bin/bash
+
+- name: Update all packages to their latest version
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+  environment:
+    - NEEDRESTART_MODE: automatically
+  changed_when: false
+  when: ansible_os_family == 'Debian'
+
+- name: update all packages to their latest version RedHat
+  dnf:
+    name: "*"
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: Install depend Debian
+  apt:
+    name: "{{ item }}"
+    state: present 
+    update_cache: yes 
+    install_recommends: yes
+  environment:
+    - NEEDRESTART_MODE: automatically
+  with_items:
+  - libpq-dev
+  - python3-psycopg2
+  when: ansible_os_family == 'Debian'
+
+- rpm_key:
+    state: present
+    key: "{{ item }}"
+  with_items:
+    - https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL
+  when: ansible_os_family == 'RedHat'
+
+- name: Install depend RedHat
+  dnf:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+  - python3-psycopg2
+  - https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  when: ansible_os_family == 'RedHat'

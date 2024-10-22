@@ -1,0 +1,3 @@
+---
+postgresql_dir: "/var/lib/pgsql/14/data"
+postgresql_service: "postgresql-14"
