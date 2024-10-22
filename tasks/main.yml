@@ -1,0 +1,21 @@
+---
+- name: Show info about the env this host belong to
+  debug:
+    msg: "This host is in {{ env }} environment!!!"
+
+- block:
+    - import_tasks: pre-install.yml
+    - import_tasks: postgres-install.yml
+  tags: install
+
+- block:
+    - import_tasks: postgres-configure-new.yml
+    - import_tasks: add-user.yml
+    - import_tasks: add-db.yml
+  tags: configure
+
+- block:
+    - import_tasks: postgres-add-on-old-server.yml
+    - import_tasks: add-user.yml
+    - import_tasks: add-db.yml
+  tags: add

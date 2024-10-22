@@ -1,0 +1,10 @@
+*.retry
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
+.pytest_cache
+/venv/
+.travis.yml
+/scripts/

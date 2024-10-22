@@ -1,0 +1,26 @@
+---
+- name: Ensure all configured locales are present.
+  locale_gen: 
+    name: "{{ item }}" 
+    state: present
+  with_items: "{{ postgresql_locales }}"
+  register: locale_gen_result
+  notify: restart postgresql
+
+- name: Template postgresql.conf
+  template: 
+    src: postgresql.conf.j2
+    dest: /etc/postgresql/14/main/postgresql.conf
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  notify: restart postgresql
+
+- name: Template pg_hba.conf
+  template: 
+    src: pg_hba.conf.j2
+    dest: /etc/postgresql/14/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: '0640'
+  notify: restart postgresql

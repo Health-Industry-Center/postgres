@@ -1,0 +1,28 @@
+---
+- name: Install postgresql
+  apt:
+    name: "{{ item }}"
+    state: present 
+    update_cache: yes 
+    install_recommends: yes
+  environment:
+    - NEEDRESTART_MODE: automatically
+  with_items:
+  - postgresql
+  - postgresql-contrib
+  - libpq-dev
+  - python3-psycopg2
+
+- name: started and enabled PostgreSQL
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Ensure PostgreSQL unix socket dirs exist.
+  file:
+    path: /var/run/postgresql
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: 02775
