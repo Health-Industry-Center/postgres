@@ -1,7 +1,7 @@
 ---
 - name: add new line in pg_hba.conf
   lineinfile:
-    dest: /etc/postgresql/14/main/pg_hba.conf
+    dest: "{{ postgresql_dir }}/pg_hba.conf"
     owner: postgres
     group: postgres
     mode: '0640'

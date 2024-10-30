@@ -1,0 +1,22 @@
+sudo dnf update
+sudo dnf -qy module disable postgresql
+sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+sudo dnf install -y postgresql14-server
+
+
+
+
+sudo /usr/pgsql-14/bin/postgresql-14-setup initdb
+sudo systemctl enable postgresql-14
+
+/var/lib/pgsql/14/data
+
+# almalinux 8
+ansible_os_family=RedHat
+ansible_distribution=AlmaLinux
+ansible_distribution_version=8.10
+
+# ubuntu 22.04
+ansible_os_family=Debian
+ansible_distribution=Ubuntu
+ansible_distribution_version=22.04

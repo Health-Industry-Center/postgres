@@ -9,8 +9,8 @@
 
 - name: Template postgresql.conf
   template: 
-    src: postgresql.conf.j2
-    dest: /etc/postgresql/14/main/postgresql.conf
+    src: "{{ ansible_distribution }}-{{ ansible_distribution_version.split('.')[0] }}-postgresql.conf.j2"
+    dest: "{{ postgresql_dir }}/postgresql.conf.j2"
     owner: postgres
     group: postgres
     mode: '0644'
@@ -19,7 +19,7 @@
 - name: Template pg_hba.conf
   template: 
     src: pg_hba.conf.j2
-    dest: /etc/postgresql/14/main/pg_hba.conf
+    dest: "{{ postgresql_dir }}/pg_hba.conf"
     owner: postgres
     group: postgres
     mode: '0640'
